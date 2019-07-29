@@ -150,9 +150,9 @@ final class LoadingMediaState: PlayerState {
     }
 
     private func startBgTask(context: PlayerContext) {
-        context.bgToken = UIApplication.shared.beginBackgroundTask { [context] in
-            if let token = context.bgToken { UIApplication.shared.endBackgroundTask(token) }
-            context.bgToken = nil
+        context.bgToken = UIApplication.shared.beginBackgroundTask { [weak self] in
+            if let token = self?.context.bgToken { UIApplication.shared.endBackgroundTask(token) }
+            self?.context.bgToken = nil
         }
         ModernAVPlayerLogger.instance.log(message: "StartBgTask create: \(String(describing: context.bgToken))", domain: .service)
     }
@@ -166,10 +166,12 @@ final class LoadingMediaState: PlayerState {
         case .readyToPlay:
             guard let position = self.position else { moveToLoadedState(); return }
             let seekPosition = CMTime(seconds: position, preferredTimescale: context.config.preferedTimeScale)
-            context.player.seek(to: seekPosition) { [context] completed in
+            context.player.seek(to: seekPosition) { [weak self] completed in
+                if let context = self?.context {
                 context.delegate?.playerContext(didCurrentTimeChange: context.currentTime)
                 guard completed else { return }
-                self.moveToLoadedState()
+                self?.moveToLoadedState()
+                }
             }
         @unknown default:
             ModernAVPlayerLogger.instance.log(message: "Unknown PlayerItem Status case", domain: .error)

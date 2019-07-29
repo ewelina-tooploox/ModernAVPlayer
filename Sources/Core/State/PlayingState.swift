@@ -78,11 +78,11 @@ final class PlayingState: PlayerState {
     // MARK: - Background task
 
     private func startBgTask(context: PlayerContext) {
-        context.bgToken = UIApplication.shared.beginBackgroundTask { [context] in
-            if let token = context.bgToken {
+        context.bgToken = UIApplication.shared.beginBackgroundTask { [weak context] in
+            if let token = context?.bgToken {
                 UIApplication.shared.endBackgroundTask(token)
             }
-            context.bgToken = nil
+            context?.bgToken = nil
         }
         ModernAVPlayerLogger.instance.log(message: "StartBgTask create: \(String(describing: context.bgToken))", domain: .service)
     }
@@ -130,7 +130,8 @@ final class PlayingState: PlayerState {
 
         itemPlaybackObservingService.onPlaybackStalled = { [weak self] in self?.redirectToWaitingForNetworkState() }
         itemPlaybackObservingService.onFailedToPlayToEndTime = { [weak self] in self?.redirectToWaitingForNetworkState() }
-        itemPlaybackObservingService.onPlayToEndTime = { [weak self, context] in
+        itemPlaybackObservingService.onPlayToEndTime = { [weak self] in
+            guard let context = self?.context else { return }
             context.delegate?.playerContext(didItemPlayToEndTime: context.currentTime)
             context.plugins.forEach { $0.didItemPlayToEndTime(media: media, endTime: context.currentTime) }
             if context.loopMode {
