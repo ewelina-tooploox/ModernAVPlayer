@@ -95,7 +95,9 @@ final class ModernAVPlayerPlaybackObservingService: PlaybackObservingService {
     ///
     @objc
     private func itemPlayToEndTime() {
-        guard hasReallyReachedEndTime(player: player) else { itemFailedToPlayToEndTime(); return }
+        guard hasReallyReachedEndTime(player: player) else {
+            return
+        }
         ModernAVPlayerLogger.instance.log(message: "Item play to end time notification", domain: .service)
         onPlayToEndTime?()
     }
