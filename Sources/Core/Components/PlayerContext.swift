@@ -27,6 +27,7 @@
 import AVFoundation
 
 protocol PlayerContextDelegate: class {
+    func playerContext(willStateChange state: ModernAVPlayer.State)
     func playerContext(didStateChange state: ModernAVPlayer.State)
     func playerContext(didCurrentMediaChange media: PlayerMedia?)
     func playerContext(didCurrentTimeChange currentTime: Double)
@@ -88,6 +89,9 @@ final class ModernAVPlayerContext: NSObject, PlayerContext {
     }
 
     var state: PlayerState! {
+        willSet(newValue) {
+            delegate?.playerContext(willStateChange: newValue.type)
+        }
         didSet {
             ModernAVPlayerLogger.instance.log(message: state.type.description, domain: .state)
             state.contextUpdated()

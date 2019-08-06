@@ -27,6 +27,7 @@
 import AVFoundation
 
 public protocol ModernAVPlayerDelegate: class {
+    func modernAVPlayer(_ player: ModernAVPlayer, willStateChange state: ModernAVPlayer.State)
     func modernAVPlayer(_ player: ModernAVPlayer, didStateChange state: ModernAVPlayer.State)
     func modernAVPlayer(_ player: ModernAVPlayer, didCurrentMediaChange media: PlayerMedia?)
     func modernAVPlayer(_ player: ModernAVPlayer, didCurrentTimeChange currentTime: Double)
@@ -174,6 +175,10 @@ public extension ModernAVPlayer {
 }
 
 extension ModernAVPlayer: PlayerContextDelegate {
+    func playerContext(willStateChange state: ModernAVPlayer.State) {
+        delegate?.modernAVPlayer(self, willStateChange: state)
+    }
+    
     func playerContext(didStateChange state: ModernAVPlayer.State) {
         delegate?.modernAVPlayer(self, didStateChange: state)
     }
