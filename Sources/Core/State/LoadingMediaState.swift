@@ -87,7 +87,13 @@ final class LoadingMediaState: PlayerState {
     }
     
     private func setupInterruptionCallback() {
-        interruptionAudioService.onInterruptionBegan = { [weak self] in self?.pause() }
+        interruptionAudioService.onInterruptionBegan = { [weak self] in
+            if let media = self?.context.currentMedia, media.isLive() {
+                self?.stop()
+            } else {
+                self?.pause()
+            }
+        }
     }
 
     // MARK: - Shared actions
