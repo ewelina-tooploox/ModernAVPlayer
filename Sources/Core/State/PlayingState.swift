@@ -160,14 +160,20 @@ final class PlayingState: PlayerState {
     // MARK: - Interruption Service
     
     private func setupInterruptionCallback() {
-        interruptionAudioService.onInterruptionBegan = { [weak self] in self?.pauseByInterruption() }
+        interruptionAudioService.onInterruptionBegan = { [weak self] in
+            if let media = self?.context.currentMedia  {
+                self?.pauseByInterruption(isLive: media.isLive())
+            } else {
+                self?.pauseByInterruption(isLive: false)
+            }
+        }
     }
     
     /*
      Do not set any call back on interruption ended when user play from another app
     */
-    private func pauseByInterruption() {
-        let state = PausedState(context: context)
+    private func pauseByInterruption(isLive: Bool) {
+        let state = isLive ? StoppedState(context: context) : PausedState(context: context)
         if !audioSession.secondaryAudioShouldBeSilencedHint {
             state.onInterruptionEnded = { [weak state] in state?.play() }
         }

@@ -56,6 +56,9 @@ ModernAVPlayerDelegate {
     
     // MARK: - ModernAVPlayerDelegate
     
+    public func modernAVPlayer(_ player: ModernAVPlayer, willStateChange state: ModernAVPlayer.State) {
+    }
+    
     public func modernAVPlayer(_ player: ModernAVPlayer, didStateChange state: ModernAVPlayer.State) {
         stateSubject.onNext(state)
     }
